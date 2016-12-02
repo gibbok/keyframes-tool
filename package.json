@@ -1,0 +1,24 @@
+{
+  "name": "web-animations-keyframes-tool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gibbok/web-animations-keyframes-tool.git"
+  },
+  "author": "GibboK",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gibbok/web-animations-keyframes-tool/issues"
+  },
+  "homepage": "https://github.com/gibbok/web-animations-keyframes-tool#readme",
+  "dependencies": {
+    "css": "^2.2.1",
+    "ramda":"^0.22.1"
+  },
+  "devDependencies": {}
+}
