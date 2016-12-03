@@ -22,20 +22,58 @@ let parse = function (data) {
     if (hasParsingErrors) {
         throw 'file has parsing errors';
     }
-    var predKeyframes = (rule) => rule.type === 'keyframes';
-    let hasKeyframes = R.any(predKeyframes, obj.stylesheet.rules);
+    var predRulesKeyframes = (rule) => rule.type === 'keyframes';
+    let hasKeyframes = R.any(predRulesKeyframes, obj.stylesheet.rules);
     if (!hasKeyframes) {
         throw 'file does not contain keyframes rules';
     }
+    var krs = obj.stylesheet.rules.filter(function (rule) {
+        return rule.type === 'keyframes'
+    });
+    debugger
+    var result = {};
+    krs.forEach(function (kr) {
+        result[kr.name] = [];
+        kr.keyframes.forEach(function (kf) {
+            kf.values.forEach(function (v) {
+                var r = {};
+                kf.declarations.forEach(function (d) {
+                    var vNew;
+                    vNew = v;
+                    if (v === 'from') {
+                        vNew = 0;
+                    } else if (v === 'to') {
+                        vNew = 100;
+                    } else {
+                        vNew = parseFloat(v);
+                    }
+                    r.offset = vNew;
+                    r[d.property] = d.value;
+                    result[kr.name].push(r);
+                });
+            });
+        });
+    });
 
-    // process rules keyframes
-    let keyframesRules = R.filter(predKeyframes, obj.stylesheet.rules);
+    debugger
+    // get all rules with type keyframes
+    // for each rule keyframe take values
+    // for each values
+    // loop in declarations
+    // create an object for result for each property and value
+
+    var result = [];
+    debugger
+
+
+
 
     console.log(obj);
 
     //let result = css.stringify(obj);
     //console.log(JSON.stringify(result));
 };
+
 
 
 
