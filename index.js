@@ -30,7 +30,6 @@ let parse = function (data) {
     var kfs = obj.stylesheet.rules.filter(function (rule) {
         return rule.type === 'keyframes'
     });
-    debugger
     var result = {};
     // keyframes
     kfs.forEach(function (kf) {
@@ -64,7 +63,6 @@ let parse = function (data) {
     // loop in declarations
     // create an object for result for each property and value
 
-    var result = [];
     debugger
 
 
