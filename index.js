@@ -27,30 +27,32 @@ let parse = function (data) {
     if (!hasKeyframes) {
         throw 'file does not contain keyframes rules';
     }
-    var krs = obj.stylesheet.rules.filter(function (rule) {
+    var kfs = obj.stylesheet.rules.filter(function (rule) {
         return rule.type === 'keyframes'
     });
     debugger
     var result = {};
-    krs.forEach(function (kr) {
-        result[kr.name] = [];
-        kr.keyframes.forEach(function (kf) {
-            kf.values.forEach(function (v) {
+    // keyframes
+    kfs.forEach(function (kf) {
+        result[kf.name] = [];
+        kf.keyframes.forEach(function (kfi) {
+            kfi.values.forEach(function (v) {
                 var r = {};
-                kf.declarations.forEach(function (d) {
-                    var vNew;
-                    vNew = v;
-                    if (v === 'from') {
-                        vNew = 0;
-                    } else if (v === 'to') {
-                        vNew = 100;
-                    } else {
-                        vNew = parseFloat(v);
-                    }
-                    r.offset = vNew;
+                var vNew;
+                vNew = v;
+                if (v === 'from') {
+                    vNew = 0;
+                } else if (v === 'to') {
+                    vNew = 100;
+                } else {
+                    vNew = parseFloat(v);
+                }
+                r.offset = vNew;
+                kfi.declarations.forEach(function (d) {
                     r[d.property] = d.value;
-                    result[kr.name].push(r);
+
                 });
+                result[kf.name].push(r);
             });
         });
     });
