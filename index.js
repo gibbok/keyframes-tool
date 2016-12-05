@@ -2,17 +2,22 @@ const css = require('css');
 const R = require('ramda');
 const fs = require('fs');
 
-
 fs.readFile(__dirname + '/test.css', function (err, data) {
     if (err) {
-        throw err;
+        console.warn(`error: ${err.message}`);
+        return;
     }
     logic(data);
 });
 
 let logic = data => {
-    var parsedData = parse(data),
-        isValid = validate(parsedData);
+    try {
+        var parsedData = parse(data);
+    } catch (err) {
+        console.warn('error: issue with parsing');
+        return false;
+    }
+    var isValid = validate(parsedData);
     if (isValid) {
         process(parsedData);
     }
@@ -26,12 +31,20 @@ let validate = data => {
     let isStylesheet = data.type === 'stylesheet',
         hasNoParsingErrors = 'stylesheet' in data && data.stylesheet.parsingErrors.length === 0,
         hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
-    if (!isStylesheet && !hasNoParsingErrors && !hasKeyframes) {
-        throw 'an error';
+    if (!isStylesheet || !hasNoParsingErrors || !hasKeyframes) {
+        if (!isStylesheet) {
+            console.warn('error: ast is not of type stylesheet');
+        }
+        if (!hasNoParsingErrors) {
+            R.map(e => console.warn(e), data.stylesheet.parsingErrors);
+        }
+        if (!hasKeyframes) {
+            console.warn('error: no keyframes rules found');
+        }
+        return false;
     }
     return true;
 };
-
 
 let process = function (data) {
     var processKeyframe = (vals, declarations) => [
@@ -75,7 +88,7 @@ let process = function (data) {
         ]))
 
     var result = transformAST(data)
-    debugger
+    console.log(JSON.stringify(result));
 };
 
 
@@ -103,7 +116,6 @@ let process = function (data) {
     //             r.offset = vNew;
     //             kfi.declarations.forEach(function (d) {
     //                 r[d.property] = d.value;
-
     //             });
     //             result[kf.name].push(r);
     //         });
