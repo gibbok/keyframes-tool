@@ -33,13 +33,13 @@ let validate = data => {
         hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
     if (!isStylesheet || !hasNoParsingErrors || !hasKeyframes) {
         if (!isStylesheet) {
-            console.warn('error: ast is not of type stylesheet');
+            console.warn(new Error('error: ast is not of type stylesheet'));
         }
         if (!hasNoParsingErrors) {
-            R.map(e => console.warn(e), data.stylesheet.parsingErrors);
+            R.map(err => console.warn(new Error(`error: ${err}`)), data.stylesheet.parsingErrors);
         }
         if (!hasKeyframes) {
-            console.warn('error: no keyframes rules found');
+            console.warn(new Error('error: no keyframes rules found'));
         }
         return false;
     }
@@ -91,12 +91,6 @@ let process = function (data) {
     console.log(JSON.stringify(result));
 };
 
-
-
-
-
-
-    // //--------------------------------------
     // var result = {};
     // // keyframes
     // kfs.forEach(function (kf) {
