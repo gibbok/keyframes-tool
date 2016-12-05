@@ -12,14 +12,14 @@ fs.readFile(__dirname + '/test.css', function (err, data) {
 
 let logic = data => {
     try {
-        var parsedData = parse(data);
+        let parsedData = parse(data),
+            isValid = validate(parsedData);
+        if (isValid) {
+            process(parsedData);
+        }
     } catch (err) {
         console.warn('error: issue with parsing');
         return false;
-    }
-    var isValid = validate(parsedData);
-    if (isValid) {
-        process(parsedData);
     }
 };
 
@@ -47,7 +47,7 @@ let validate = data => {
 };
 
 let process = function (data) {
-    var processKeyframe = (vals, declarations) => [
+    let processKeyframe = (vals, declarations) => [
         R.map(R.cond([
             [R.equals('from'), R.always(0)],
             [R.equals('to'), R.always(100)],
@@ -58,14 +58,14 @@ let process = function (data) {
                 R.prop('property'),
                 R.prop('value')
             ]), declarations))
-    ]
+    ];
 
-    var processAnimation = (offsets, transf) =>
+    let processAnimation = (offsets, transf) =>
         R.map(R.pipe(
             R.objOf('offset'),
-            R.merge(transf)), offsets)
+            R.merge(transf)), offsets);
 
-    var getContentOfKeyframes = R.map(R.pipe(
+    let getContentOfKeyframes = R.map(R.pipe(
         R.converge(processKeyframe, [
             R.prop('values'),
             R.prop('declarations')
@@ -73,9 +73,9 @@ let process = function (data) {
         R.converge(processAnimation, [
             R.nth(0),
             R.nth(1)
-        ])))
+        ])));
 
-    var transformAST = R.pipe(
+    let transformAST = R.pipe(
         R.path(['stylesheet', 'rules']),
         R.filter(R.propEq('type', 'keyframes')),
         R.map((keyframe) => ({
@@ -85,9 +85,9 @@ let process = function (data) {
         R.converge(R.zipObj, [
             R.map(R.prop('name')),
             R.map(R.pipe(R.prop('content'), R.flatten))
-        ]))
+        ]));
 
-    var result = transformAST(data)
+    let result = transformAST(data)
     console.log(JSON.stringify(result));
 };
 
@@ -119,7 +119,3 @@ let process = function (data) {
 
     //let result = css.stringify(obj);
     //console.log(JSON.stringify(result));
-
-
-
-
