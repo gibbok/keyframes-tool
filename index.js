@@ -2,33 +2,38 @@ const css = require('css');
 const R = require('ramda');
 const fs = require('fs');
 
+
 fs.readFile(__dirname + '/test.css', function (err, data) {
     if (err) {
         throw err;
     }
-    parse(data);
+    logic(data);
 });
 
-let parse = function (data) {
-    debugger
-    // parse data file
-    let obj = css.parse(data.toString(), { silent: false });
-
-    // validation
-    if(!R.path(['type'], obj) === 'stylesheet'){
-        throw 'file is not a stylesheet';
+let logic = data => {
+    var parsedData = parse(data),
+        isValid = validate(parsedData);
+    if (isValid) {
+        process(parsedData);
     }
-    if(!R.length(R.path(['stylesheet','parsingErrors'], obj)) === 0){
-        throw 'file has parsing errors';
-    }
+};
 
-    var predRulesKeyframes = (rule) => rule.type === 'keyframes';
-    let hasKeyframes = R.any(predRulesKeyframes, obj.stylesheet.rules);
-    if (!hasKeyframes) {
-        throw 'file does not contain keyframes rules';
-    }
+let parse = data => {
+    return css.parse(data.toString(), { silent: false });
+};
 
-    debugger
+let validate = data => {
+    let isStylesheet = data.type === 'stylesheet',
+        hasNoParsingErrors = 'stylesheet' in data && data.stylesheet.parsingErrors.length === 0,
+        hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
+    if (!isStylesheet && !hasNoParsingErrors && !hasKeyframes) {
+        throw 'an error';
+    }
+    return true;
+};
+
+
+let process = function (data) {
     var processKeyframe = (vals, declarations) => [
         R.map(R.cond([
             [R.equals('from'), R.always(0)],
@@ -69,8 +74,15 @@ let parse = function (data) {
             R.map(R.pipe(R.prop('content'), R.flatten))
         ]))
 
-    var result = transformAST(obj)
+    var result = transformAST(data)
     debugger
+};
+
+
+
+
+
+
     // //--------------------------------------
     // var result = {};
     // // keyframes
@@ -101,12 +113,6 @@ let parse = function (data) {
 
     //let result = css.stringify(obj);
     //console.log(JSON.stringify(result));
-};
-
-
-
-
-
 
 
 
