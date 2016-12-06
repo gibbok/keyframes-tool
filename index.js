@@ -32,14 +32,17 @@ let logic = data => {
             processAST(parsedData);
         }
     } catch (err) {
-        debugger
         console.warn('error: issue with parsing');
         return false;
     }
 };
 
 let parse = data => {
-    return css.parse(data.toString(), { silent: false });
+    try {
+        return css.parse(data.toString(), { silent: false });
+    } catch (err) {
+        throw err.message;
+    }
 };
 
 let validate = data => {
@@ -48,7 +51,6 @@ let validate = data => {
         hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
     if (!isStylesheet || !hasNoParsingErrors || !hasKeyframes) {
         if (!isStylesheet) {
-            //console.warn(new Error('error: ast is not of type stylesheet'));
             throw 'error: ast is not of type stylesheet';
         }
         if (!hasNoParsingErrors) {
@@ -56,7 +58,6 @@ let validate = data => {
             throw 'error: file has parse error';
         }
         if (!hasKeyframes) {
-            //console.warn(new Error('error: no keyframes rules found'));
             throw 'error: no keyframes rules found';
         }
         return false;
@@ -134,6 +135,7 @@ let getNodeArguments = () => {
 let init = () => {
     try {
         getNodeArguments();
+        // TODO use promise here
         readFile();
     } catch (err) {
         console.warn(`error: ${err}`);
@@ -141,13 +143,3 @@ let init = () => {
 };
 
 init();
-
-// readFile(__dirname + '/test.css');
-
-/*
-
-node index test.css test.json
-
-node --debug index.js /test.css / test.json
-node --debug-brk index.js /test.css / test.json
- */
