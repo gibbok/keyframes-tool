@@ -1,6 +1,7 @@
 const css = require('css');
 const R = require('ramda');
 const fs = require('fs');
+const path = require('path');
 
 let fileIn,
     fileOut;
@@ -19,7 +20,7 @@ let writeFile = (data) => {
         if (err) {
             throw err.message;
         }
-        console.log(JSON.stringify(data));
+        console.log('success: file created at: ' + fileOut);
     });
 };
 
@@ -116,14 +117,14 @@ let getNodeArguments = () => {
         argFileOut = '';
     if (!hasFileInOutArgs) {
         throw ('arguments for file-in and file-out must be provided');
-    }   
-    argFileIn = __dirname + process.argv[2];
-    argFileOut =__dirname + process.argv[3];
+    }
+    argFileIn = path.resolve(path.normalize(__dirname + process.argv[2])).toString();
+    argFileOut = path.resolve(path.normalize(__dirname + process.argv[3])).toString();
     if (!argFileIn.endsWith('.css')) {
-       throw ('argument file-in must have extension .css');
+        throw ('argument file-in must have extension .css');
     }
     if (!argFileOut.endsWith('.json')) {
-       throw ('argument file-out must have extension .json');
+        throw ('argument file-out must have extension .json');
     }
     // var [,, argFileIn, argFileOut] = process.argv; // destructuring assignment
     fileIn = argFileIn;
