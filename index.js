@@ -7,8 +7,8 @@ let fileIn,
     fileOut;
 
 let readFile = () => {
-    return new Promise(function(fulfill, reject) {
-        fs.readFile(fileIn, function(err, data) {
+    return new Promise((fulfill, reject) => {
+        fs.readFile(fileIn, (err, data) => {
             if (err) {
                 reject(err);
             } else {
@@ -19,8 +19,8 @@ let readFile = () => {
 }
 
 let writeFile = (data) => {
-    return new Promise(function(fulfill, reject) {
-        fs.writeFile(fileOut, JSON.stringify(data), function(err) {
+    return new Promise((fulfill, reject) => {
+        fs.writeFile(fileOut, JSON.stringify(data), (err) => {
             if (err) {
                 reject(err);
             } else {
@@ -38,13 +38,13 @@ let logic = (data) => {
             processAST(parsedData);
         }
     } catch (err) {
-        console.warn('error: issue with parsing');
+        console.log('error: issue with parsing');
         return false;
     }
 };
 
 let parse = (data) => {
-    return new Promise(function(fulfill, reject) {
+    return new Promise((fulfill, reject) => {
         try {
             let parsedData = css.parse(data.toString(), { silent: false });
             fulfill(parsedData);
@@ -55,7 +55,7 @@ let parse = (data) => {
 };
 
 let validate = (data) => {
-    return new Promise(function(fulfill, reject) {
+    return new Promise((fulfill, reject) => {
         let isStylesheet = data.type === 'stylesheet',
             hasNoParsingErrors = 'stylesheet' in data && data.stylesheet.parsingErrors.length === 0,
             hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
@@ -64,7 +64,7 @@ let validate = (data) => {
                 throw 'error: ast is not of type stylesheet';
             }
             if (!hasNoParsingErrors) {
-                R.map(err => console.warn(new Error(`error: ${err}`)), data.stylesheet.parsingErrors);
+                R.map(err => console.log(new Error(`error: ${err}`)), data.stylesheet.parsingErrors);
                 throw 'error: file has parse error';
             }
             if (!hasKeyframes) {
@@ -77,7 +77,7 @@ let validate = (data) => {
 };
 
 let processAST = (data) => {
-    return new Promise(function(fulfill, reject) {
+    return new Promise((fulfill, reject) => {
         try {
             // original version with no ramda visible at http://codepen.io/gibbok/pen/PbRrxp
             let processKeyframe = (vals, declarations) => [
@@ -124,12 +124,11 @@ let processAST = (data) => {
         } catch (err) {
             reject(err);
         }
-
     });
 };
 
 let getNodeArguments = () => {
-    return new Promise(function(fulfill, reject) {
+    return new Promise((fulfill, reject) => {
         try {
             let hasFileInOutArgs = process.argv.length === 4,
                 isCssExt = false,
@@ -158,23 +157,21 @@ let getNodeArguments = () => {
 };
 
 let init = () => {
-    try {
-        getNodeArguments().then(() => {
-            return readFile();
-        }).then((data) => {
-            return parse(data);
-        }).then((data) => {
-            return validate(data);
-        }).then((data) => {
-            return processAST(data);
-        }).then((data) => {
-            return writeFile(data);
-        }).then((data) => {
-            console.log('success: file created at: ' + fileOut);
-        });
-    } catch (err) {
-        console.warn(`error: ${err}`);
-    }
+    getNodeArguments().then(() => {
+        return readFile();
+    }).then((data) => {
+        return parse(data);
+    }).then((data) => {
+        return validate(data);
+    }).then((data) => {
+        return processAST(data);
+    }).then((data) => {
+        return writeFile(data);
+    }).then((data) => {
+        console.log('success: file created at: ' + fileOut);
+    }).catch(function (err) {
+        console.log('error: ' + err);
+    });
 };
 
 init();
