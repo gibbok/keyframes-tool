@@ -2,21 +2,22 @@ const css = require('css');
 const R = require('ramda');
 const fs = require('fs');
 
-let readFile = (fileName) => {
-    fs.readFile(fileName, function (err, data) {
+let fileIn,
+    fileOut;
+
+let readFile = () => {
+    fs.readFile(fileIn, function (err, data) {
         if (err) {
-            console.warn(`error: ${err.message}`);
-            return;
+            throw err.message;
         }
         logic(data);
     });
 };
 
-let writeFile = (fileName, data) => {
-    fs.writeFile(fileName, JSON.stringify(data), function (err) {
+let writeFile = (data) => {
+    fs.writeFile(fileOut, JSON.stringify(data), function (err) {
         if (err) {
-            console.warn(`error: ${err.message}`);
-            return;
+            throw err.message;
         }
         console.log(JSON.stringify(data));
     });
@@ -27,9 +28,10 @@ let logic = data => {
         let parsedData = parse(data),
             isValid = validate(parsedData);
         if (isValid) {
-            process(parsedData);
+            processAST(parsedData);
         }
     } catch (err) {
+        debugger
         console.warn('error: issue with parsing');
         return false;
     }
@@ -45,20 +47,23 @@ let validate = data => {
         hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
     if (!isStylesheet || !hasNoParsingErrors || !hasKeyframes) {
         if (!isStylesheet) {
-            console.warn(new Error('error: ast is not of type stylesheet'));
+            //console.warn(new Error('error: ast is not of type stylesheet'));
+            throw 'error: ast is not of type stylesheet';
         }
         if (!hasNoParsingErrors) {
             R.map(err => console.warn(new Error(`error: ${err}`)), data.stylesheet.parsingErrors);
+            throw 'error: file has parse error';
         }
         if (!hasKeyframes) {
-            console.warn(new Error('error: no keyframes rules found'));
+            //console.warn(new Error('error: no keyframes rules found'));
+            throw 'error: no keyframes rules found';
         }
         return false;
     }
     return true;
 };
 
-let process = function (data) {
+let processAST = (data) => {
     // original version with no ramda visible at http://codepen.io/gibbok/pen/PbRrxp
     let processKeyframe = (vals, declarations) => [
         R.map(R.cond([
@@ -99,13 +104,49 @@ let process = function (data) {
             R.map(R.prop('name')),
             R.map(R.pipe(R.prop('content'), R.flatten))
         ]));
-
     let result = transformAST(data)
-    writeFile(__dirname + '/test.json', result);
+    writeFile(result);
 };
 
+let getNodeArguments = () => {
+    let hasFileInOutArgs = process.argv.length === 4,
+        isCssExt = false,
+        isJsonExt = false,
+        argFileIn = '',
+        argFileOut = '';
+    if (!hasFileInOutArgs) {
+        throw ('arguments for file-in and file-out must be provided');
+    }   
+    argFileIn = __dirname + process.argv[2];
+    argFileOut =__dirname + process.argv[3];
+    if (!argFileIn.endsWith('.css')) {
+       throw ('argument file-in must have extension .css');
+    }
+    if (!argFileOut.endsWith('.json')) {
+       throw ('argument file-out must have extension .json');
+    }
+    // var [,, argFileIn, argFileOut] = process.argv; // destructuring assignment
+    fileIn = argFileIn;
+    fileOut = argFileOut;
+};
 
-readFile(__dirname + '/test.css');
+let init = () => {
+    try {
+        getNodeArguments();
+        readFile();
+    } catch (err) {
+        console.warn(`error: ${err}`);
+    }
+};
 
-    //let result = css.stringify(obj);
-    //console.log(JSON.stringify(result));
+init();
+
+// readFile(__dirname + '/test.css');
+
+/*
+
+node index test.css test.json
+
+node --debug index.js /test.css / test.json
+node --debug-brk index.js /test.css / test.json
+ */

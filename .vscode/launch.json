@@ -9,13 +9,15 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceRoot}\\index.js",
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceRoot}",
+            "args": [ "/test.css", "/test.json" ]
         },
         {
-            "type": "node",
-            "request": "attach",
-            "name": "Attach to Process",
-            "port": 5858
+			"name": "Attach to Node",
+			"type": "node",
+			"request": "attach",
+			"port": 5858,
+			"restart": false
         }
     ]
 }
