@@ -10,7 +10,7 @@
             "name": "Launch Program",
             "program": "${workspaceRoot}\\index.js",
             "cwd": "${workspaceRoot}",
-            "args": [ "/test.cssXX", "/test.jsonXX" ]
+            "args": [ "/test.css", "/test.json" ]
         },
         {
 			"name": "Attach to Node",

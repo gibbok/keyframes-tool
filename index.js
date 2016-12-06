@@ -6,6 +6,35 @@ const path = require('path');
 let fileIn,
     fileOut;
 
+let getNodeArguments = () => {
+    return new Promise((fulfill, reject) => {
+        try {
+            let hasFileInOutArgs = process.argv.length === 4,
+                isCssExt = false,
+                isJsonExt = false,
+                argFileIn = '',
+                argFileOut = '';
+            if (!hasFileInOutArgs) {
+                throw ('arguments for file-in and file-out must be provided');
+            }
+            argFileIn = path.resolve(path.normalize(__dirname + process.argv[2])).toString();
+            argFileOut = path.resolve(path.normalize(__dirname + process.argv[3])).toString();
+            if (!argFileIn.endsWith('.css')) {
+                throw ('argument file-in must have extension .css');
+            }
+            if (!argFileOut.endsWith('.json')) {
+                throw ('argument file-out must have extension .json');
+            }
+            // var [,, argFileIn, argFileOut] = process.argv; // destructuring assignment
+            fileIn = argFileIn;
+            fileOut = argFileOut;
+            fulfill();
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
 let readFile = () => {
     return new Promise((fulfill, reject) => {
         fs.readFile(fileIn, (err, data) => {
@@ -17,31 +46,6 @@ let readFile = () => {
         });
     });
 }
-
-let writeFile = (data) => {
-    return new Promise((fulfill, reject) => {
-        fs.writeFile(fileOut, JSON.stringify(data), (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                fulfill(data);
-            }
-        });
-    });
-};
-
-let logic = (data) => {
-    try {
-        let parsedData = parse(data),
-            isValid = validate(parsedData);
-        if (isValid) {
-            processAST(parsedData);
-        }
-    } catch (err) {
-        console.log('error: issue with parsing');
-        return false;
-    }
-};
 
 let parse = (data) => {
     return new Promise((fulfill, reject) => {
@@ -75,6 +79,7 @@ let validate = (data) => {
         fulfill(data);
     });
 };
+
 
 let processAST = (data) => {
     return new Promise((fulfill, reject) => {
@@ -127,32 +132,15 @@ let processAST = (data) => {
     });
 };
 
-let getNodeArguments = () => {
+let writeFile = (data) => {
     return new Promise((fulfill, reject) => {
-        try {
-            let hasFileInOutArgs = process.argv.length === 4,
-                isCssExt = false,
-                isJsonExt = false,
-                argFileIn = '',
-                argFileOut = '';
-            if (!hasFileInOutArgs) {
-                throw ('arguments for file-in and file-out must be provided');
+        fs.writeFile(fileOut, JSON.stringify(data), (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                fulfill(data);
             }
-            argFileIn = path.resolve(path.normalize(__dirname + process.argv[2])).toString();
-            argFileOut = path.resolve(path.normalize(__dirname + process.argv[3])).toString();
-            if (!argFileIn.endsWith('.css')) {
-                throw ('argument file-in must have extension .css');
-            }
-            if (!argFileOut.endsWith('.json')) {
-                throw ('argument file-out must have extension .json');
-            }
-            // var [,, argFileIn, argFileOut] = process.argv; // destructuring assignment
-            fileIn = argFileIn;
-            fileOut = argFileOut;
-            fulfill();
-        } catch (err) {
-            reject(err);
-        }
+        });
     });
 };
 
