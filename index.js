@@ -2,13 +2,25 @@ const css = require('css');
 const R = require('ramda');
 const fs = require('fs');
 
-fs.readFile(__dirname + '/test.css', function (err, data) {
-    if (err) {
-        console.warn(`error: ${err.message}`);
-        return;
-    }
-    logic(data);
-});
+let readFile = (fileName) => {
+    fs.readFile(fileName, function (err, data) {
+        if (err) {
+            console.warn(`error: ${err.message}`);
+            return;
+        }
+        logic(data);
+    });
+};
+
+let writeFile = (fileName, data) => {
+    fs.writeFile(fileName, JSON.stringify(data), function (err) {
+        if (err) {
+            console.warn(`error: ${err.message}`);
+            return;
+        }
+        console.log(JSON.stringify(data));
+    });
+};
 
 let logic = data => {
     try {
@@ -47,6 +59,7 @@ let validate = data => {
 };
 
 let process = function (data) {
+    // original version with no ramda visible at http://codepen.io/gibbok/pen/PbRrxp
     let processKeyframe = (vals, declarations) => [
         R.map(R.cond([
             [R.equals('from'), R.always(0)],
@@ -88,34 +101,11 @@ let process = function (data) {
         ]));
 
     let result = transformAST(data)
-    console.log(JSON.stringify(result));
+    writeFile(__dirname + '/test.json', result);
 };
 
-    // var result = {};
-    // // keyframes
-    // kfs.forEach(function (kf) {
-    //     result[kf.name] = [];
-    //     kf.keyframes.forEach(function (kfi) {
-    //         kfi.values.forEach(function (v) {
-    //             var r = {};
-    //             var vNew;
-    //             vNew = v;
-    //             if (v === 'from') {
-    //                 vNew = 0;
-    //             } else if (v === 'to') {
-    //                 vNew = 100;
-    //             } else {
-    //                 vNew = parseFloat(v);
-    //             }
-    //             r.offset = vNew;
-    //             kfi.declarations.forEach(function (d) {
-    //                 r[d.property] = d.value;
-    //             });
-    //             result[kf.name].push(r);
-    //         });
-    //     });
-    // });
 
+readFile(__dirname + '/test.css');
 
     //let result = css.stringify(obj);
     //console.log(JSON.stringify(result));
