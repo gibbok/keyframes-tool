@@ -15,7 +15,7 @@ let prerequisiteCheck = () => {
                 return numVersion = Number(strVersion.match(numberPattern).join(''))
             },
                 requiredVersion = getNodeVersion('v6.9.1'),
-                currentVersion = getNodeVersion(process.version); 
+                currentVersion = getNodeVersion(process.version);
             if (currentVersion >= requiredVersion) {
                 fulfill();
             } else {
@@ -80,26 +80,28 @@ let parse = (data) => {
 
 let validate = (data) => {
     return new Promise((fulfill, reject) => {
-        let isStylesheet = data.type === 'stylesheet',
-            hasNoParsingErrors = 'stylesheet' in data && data.stylesheet.parsingErrors.length === 0,
-            hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
-        if (!isStylesheet || !hasNoParsingErrors || !hasKeyframes) {
-            if (!isStylesheet) {
-                throw 'error: ast is not of type stylesheet';
+        try {
+            let isStylesheet = data.type === 'stylesheet',
+                hasNoParsingErrors = 'stylesheet' in data && data.stylesheet.parsingErrors.length === 0,
+                hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
+            if (!isStylesheet || !hasNoParsingErrors || !hasKeyframes) {
+                if (!isStylesheet) {
+                    throw 'error: ast is not of type stylesheet';
+                }
+                if (!hasNoParsingErrors) {
+                    R.map(err => console.log(new Error(`error: ${err}`)), data.stylesheet.parsingErrors);
+                    throw 'error: file has parse error';
+                }
+                if (!hasKeyframes) {
+                    throw 'error: no keyframes rules found';
+                }
             }
-            if (!hasNoParsingErrors) {
-                R.map(err => console.log(new Error(`error: ${err}`)), data.stylesheet.parsingErrors);
-                throw 'error: file has parse error';
-            }
-            if (!hasKeyframes) {
-                throw 'error: no keyframes rules found';
-            }
-            reject('validation error');
+            fulfill(data);
+        } catch (err) {
+            reject(err);
         }
-        fulfill(data);
     });
 };
-
 
 let processAST = (data) => {
     return new Promise((fulfill, reject) => {
