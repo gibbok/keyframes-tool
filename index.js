@@ -6,6 +6,27 @@ const path = require('path');
 let fileIn,
     fileOut;
 
+let prerequisiteCheck = () => {
+    // check node version
+    return new Promise((fulfill, reject) => {
+        try {
+            let getNodeVersion = (strVersion) => {
+                let numberPattern = /\d+/g;
+                return numVersion = Number(strVersion.match(numberPattern).join(''))
+            },
+                requiredVersion = getNodeVersion('v6.9.1'),
+                currentVersion = getNodeVersion(process.version); 
+            if (currentVersion >= requiredVersion) {
+                fulfill();
+            } else {
+                throw ('node.js version not supported, please update to latest version of node.js ');
+            }
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
 let getNodeArguments = () => {
     return new Promise((fulfill, reject) => {
         try {
@@ -25,7 +46,6 @@ let getNodeArguments = () => {
             if (!argFileOut.endsWith('.json')) {
                 throw ('argument file-out must have extension .json');
             }
-            // var [,, argFileIn, argFileOut] = process.argv; // destructuring assignment
             fileIn = argFileIn;
             fileOut = argFileOut;
             fulfill();
@@ -145,7 +165,9 @@ let writeFile = (data) => {
 };
 
 let init = () => {
-    getNodeArguments().then(() => {
+    prerequisiteCheck().then(() => {
+        return getNodeArguments();
+    }).then(() => {
         return readFile();
     }).then((data) => {
         return parse(data);
