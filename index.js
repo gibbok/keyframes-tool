@@ -4,14 +4,12 @@ const fs = require('fs');
 const path = require('path');
 
 let fileIn,
-    fileOut,
-    isFileInCss,
-    isFileOutJson;
+    fileOut;
 
 let prerequisiteCheck = () => {
-    // check node version
     return new Promise((fulfill, reject) => {
         try {
+            // check node version
             let getNodeVersion = (strVersion) => {
                 let numberPattern = /\d+/g;
                 return numVersion = Number(strVersion.match(numberPattern).join(''))
@@ -21,7 +19,7 @@ let prerequisiteCheck = () => {
             if (currentVersion >= requiredVersion) {
                 fulfill();
             } else {
-                throw ('node.js version not supported, please update to latest version of node.js ');
+                throw ('you current version of node.js is not supported, please update to the latest version of node.js');
             }
         } catch (err) {
             reject(err);
@@ -32,7 +30,7 @@ let prerequisiteCheck = () => {
 let getNodeArguments = () => {
     return new Promise((fulfill, reject) => {
         try {
-            // check if arguments are provided
+            // check paths in arguments
             let hasFileInOutArgs = process.argv.length === 4;
             if (!hasFileInOutArgs) {
                 throw ('arguments for file-in and file-out must be provided');
@@ -42,8 +40,8 @@ let getNodeArguments = () => {
             fileOut = path.resolve(path.normalize(__dirname + process.argv[3])).toString();
 
             // check paths for extensions
-            isFileInCss = fileIn.endsWith('.css');
-            isFileOutJson = fileOut.endsWith('.json');
+            let isFileInCss = fileIn.endsWith('.css'),
+                isFileOutJson = fileOut.endsWith('.json');
             if (!isFileInCss) {
                 throw ('argument file-in must have extension .css');
             }
@@ -58,6 +56,7 @@ let getNodeArguments = () => {
 };
 
 let readFile = () => {
+    // read css file
     return new Promise((fulfill, reject) => {
         fs.readFile(fileIn, (err, data) => {
             if (err) {
@@ -70,6 +69,7 @@ let readFile = () => {
 }
 
 let parse = (data) => {
+    // parse css data and create ast tree
     return new Promise((fulfill, reject) => {
         try {
             let parsedData = css.parse(data.toString(), { silent: false });
@@ -81,6 +81,7 @@ let parse = (data) => {
 };
 
 let validate = (data) => {
+    // validation ast tree
     return new Promise((fulfill, reject) => {
         try {
             let isStylesheet = data.type === 'stylesheet',
@@ -88,14 +89,14 @@ let validate = (data) => {
                 hasKeyframes = R.any((rule) => rule.type === 'keyframes', data.stylesheet.rules);
             if (!isStylesheet || !hasNoParsingErrors || !hasKeyframes) {
                 if (!isStylesheet) {
-                    throw 'error: ast is not of type stylesheet';
+                    throw 'ast is not of type stylesheet';
                 }
                 if (!hasNoParsingErrors) {
                     R.map(err => console.log(new Error(`error: ${err}`)), data.stylesheet.parsingErrors);
-                    throw 'error: file has parse error';
+                    throw 'file has parse error';
                 }
                 if (!hasKeyframes) {
-                    throw 'error: no keyframes rules found';
+                    throw 'no keyframes rules found';
                 }
             }
             fulfill(data);
@@ -106,15 +107,18 @@ let validate = (data) => {
 };
 
 let processAST = (data) => {
+    // process ast tree and transform it to a new structure new suitable for keyframeSet 
     return new Promise((fulfill, reject) => {
         try {
             // original version with no ramda visible at http://codepen.io/gibbok/pen/PbRrxp
             let processKeyframe = (vals, declarations) => [
+                // map each value
                 R.map(R.cond([
                     [R.equals('from'), R.always(0)],
                     [R.equals('to'), R.always(100)],
                     [R.T, parseFloat]
                 ]), vals),
+                // collect all property value pairs and merge in one object
                 R.reduce(R.merge, {},
                     R.map(R.converge(R.objOf, [
                         R.prop('property'),
@@ -128,22 +132,30 @@ let processAST = (data) => {
                     R.merge(transf)), offsets);
 
             let getContentOfKeyframes = R.map(R.pipe(
+                // process keyframes
                 R.converge(processKeyframe, [
                     R.prop('values'),
                     R.prop('declarations')
                 ]),
+                // process animations
                 R.converge(processAnimation, [
                     R.nth(0),
                     R.nth(1)
                 ])));
 
             let transformAST = R.pipe(
+                // get `stylesheet.rules` property
                 R.path(['stylesheet', 'rules']),
+                // get only object whose `type` property is `keyframes`
                 R.filter(R.propEq('type', 'keyframes')),
+                // map each item in `keyframes` collection
+                // to an object {name: keyframe.name, content: [contentOfkeyframes] }
                 R.map((keyframe) => ({
                     name: keyframe.name,
                     content: getContentOfKeyframes(keyframe.keyframes)
                 })),
+                // make a new object using animation `name` as keys
+                // and using a flatten content as values
                 R.converge(R.zipObj, [
                     R.map(R.prop('name')),
                     R.map(R.pipe(R.prop('content'), R.flatten))
