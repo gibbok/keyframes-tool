@@ -1,3 +1,5 @@
+/*! Keyframes-Tool | The MIT License (MIT) | Copyright (c) 2016 GibboK */
+
 const css = require('css');
 const R = require('ramda');
 const fs = require('fs');
@@ -6,6 +8,9 @@ const path = require('path');
 let fileIn,
     fileOut;
 
+/**
+ * Check software requirements.
+ */
 let prerequisiteCheck = () => {
     return new Promise((fulfill, reject) => {
         try {
@@ -27,6 +32,9 @@ let prerequisiteCheck = () => {
     });
 };
 
+/**
+ * Get arguments passed Node.js using terminal.
+ */
 let getNodeArguments = () => {
     return new Promise((fulfill, reject) => {
         try {
@@ -55,7 +63,10 @@ let getNodeArguments = () => {
     });
 };
 
-let readFile = () => {
+/**
+ * Read CSS input file.
+ */
+let readInputFile = () => {
     // read css file
     return new Promise((fulfill, reject) => {
         fs.readFile(fileIn, (err, data) => {
@@ -68,8 +79,10 @@ let readFile = () => {
     });
 }
 
+/**
+ * Parse content of CSS input file and creates and AST tree.
+ */
 let parse = (data) => {
-    // parse css data and create ast tree
     return new Promise((fulfill, reject) => {
         try {
             let parsedData = css.parse(data.toString(), { silent: false });
@@ -80,8 +93,10 @@ let parse = (data) => {
     });
 };
 
+/**
+ * Validate AST tree content.
+ */
 let validate = (data) => {
-    // validation ast tree
     return new Promise((fulfill, reject) => {
         try {
             let isStylesheet = data.type === 'stylesheet',
@@ -106,11 +121,14 @@ let validate = (data) => {
     });
 };
 
+/**
+ * Process AST tree content and a new data structure valid for Web Animation API KeyframeEffect.
+ * The following code uses Ramda.js for traversing a complex AST tree,
+ * an alternative version is visible at http://codepen.io/gibbok/pen/PbRrxp
+ */
 let processAST = (data) => {
-    // process ast tree and transform it to a new structure new suitable for keyframeSet 
     return new Promise((fulfill, reject) => {
         try {
-            // original version with no ramda visible at http://codepen.io/gibbok/pen/PbRrxp
             let processKeyframe = (vals, declarations) => [
                 // map each value
                 R.map(R.cond([
@@ -127,6 +145,7 @@ let processAST = (data) => {
             ];
 
             let processAnimation = (offsets, transf) =>
+                // process offset property
                 R.map(R.pipe(
                     R.objOf('offset'),
                     R.merge(transf)), offsets);
@@ -168,7 +187,10 @@ let processAST = (data) => {
     });
 };
 
-let writeFile = (data) => {
+/**
+ * Write JSON output file.
+ */
+let writeOutputFile = (data) => {
     return new Promise((fulfill, reject) => {
         data = JSON.stringify(data);
         fs.writeFile(fileOut, data, (err) => {
@@ -181,11 +203,14 @@ let writeFile = (data) => {
     });
 };
 
+/**
+ * Initiate conversion process.
+ */
 let init = () => {
     prerequisiteCheck().then(() => {
         return getNodeArguments();
     }).then(() => {
-        return readFile();
+        return readInputFile();
     }).then((data) => {
         return parse(data);
     }).then((data) => {
@@ -193,7 +218,7 @@ let init = () => {
     }).then((data) => {
         return processAST(data);
     }).then((data) => {
-        return writeFile(data);
+        return writeOutputFile(data);
     }).then((data) => {
         console.log('success: file created at: ' + fileOut);
     }).catch(function (err) {
