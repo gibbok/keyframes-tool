@@ -4,7 +4,9 @@ const fs = require('fs');
 const path = require('path');
 
 let fileIn,
-    fileOut;
+    fileOut,
+    isFileInCss,
+    isFileOutJson;
 
 let prerequisiteCheck = () => {
     // check node version
@@ -30,24 +32,24 @@ let prerequisiteCheck = () => {
 let getNodeArguments = () => {
     return new Promise((fulfill, reject) => {
         try {
-            let hasFileInOutArgs = process.argv.length === 4,
-                isCssExt = false,
-                isJsonExt = false,
-                argFileIn = '',
-                argFileOut = '';
+            // check if arguments are provided
+            let hasFileInOutArgs = process.argv.length === 4;
             if (!hasFileInOutArgs) {
                 throw ('arguments for file-in and file-out must be provided');
             }
-            argFileIn = path.resolve(path.normalize(__dirname + process.argv[2])).toString();
-            argFileOut = path.resolve(path.normalize(__dirname + process.argv[3])).toString();
-            if (!argFileIn.endsWith('.css')) {
+            // normalize paths
+            fileIn = path.resolve(path.normalize(__dirname + process.argv[2])).toString();
+            fileOut = path.resolve(path.normalize(__dirname + process.argv[3])).toString();
+
+            // check paths for extensions
+            isFileInCss = fileIn.endsWith('.css');
+            isFileOutJson = fileOut.endsWith('.json');
+            if (!isFileInCss) {
                 throw ('argument file-in must have extension .css');
             }
-            if (!argFileOut.endsWith('.json')) {
+            if (!isFileOutJson) {
                 throw ('argument file-out must have extension .json');
             }
-            fileIn = argFileIn;
-            fileOut = argFileOut;
             fulfill();
         } catch (err) {
             reject(err);
@@ -156,7 +158,8 @@ let processAST = (data) => {
 
 let writeFile = (data) => {
     return new Promise((fulfill, reject) => {
-        fs.writeFile(fileOut, JSON.stringify(data), (err) => {
+        data = JSON.stringify(data);
+        fs.writeFile(fileOut, data, (err) => {
             if (err) {
                 reject(err);
             } else {
