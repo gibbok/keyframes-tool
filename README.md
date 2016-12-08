@@ -1,1 +1,1 @@
-# web-animations-keyframes-tool
+# keyframes-tool
