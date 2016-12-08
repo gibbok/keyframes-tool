@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}\\index.js",
+            "program": "${workspaceRoot}\\keyframes-tool.js",
             "cwd": "${workspaceRoot}",
             "args": [ "/test.css", "/test.json" ]
         },
