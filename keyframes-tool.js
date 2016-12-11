@@ -130,11 +130,11 @@ let processAST = (data) => {
     return new Promise((fulfill, reject) => {
         try {
             let processKeyframe = (vals, declarations) => [
-                // map each value
+                // map each value covnerting offset to decimal point
                 R.map(R.cond([
                     [R.equals('from'), R.always(0)],
-                    [R.equals('to'), R.always(100)],
-                    [R.T, parseFloat]
+                    [R.equals('to'), R.always(1)],
+                    [R.T, value => parseFloat(value) / 100]
                 ]), vals),
                 // collect all property value pairs and merge in one object
                 R.reduce(R.merge, {},
