@@ -178,8 +178,11 @@ let processAST = (data) => {
                 R.converge(R.zipObj, [
                     R.map(R.prop('name')),
                     R.map(R.pipe(R.prop('content'), R.flatten))
-                ]));
-            let result = transformAST(data)
+                ]),
+                // order by property `offset` ascending
+                R.map(R.pipe(R.sortBy(R.prop('offset'))))
+            );
+            let result = transformAST(data);
             fulfill(result);
         } catch (err) {
             reject(err);
@@ -221,7 +224,7 @@ let init = () => {
         return writeOutputFile(data);
     }).then((data) => {
         console.log('success: file created at: ' + fileOut);
-    }).catch(function (err) {
+    }).catch(function(err) {
         console.log('error: ' + err);
     });
 };
