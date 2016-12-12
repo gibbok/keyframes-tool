@@ -134,7 +134,7 @@ let processAST = (data) => {
                 R.map(R.cond([
                     [R.equals('from'), R.always(0)],
                     [R.equals('to'), R.always(1)],
-                    [R.T, offset => parseFloat(offset) / 100] // covert `offset` to decimal point
+                    [R.T, R.pipe(parseFloat, R.divide(R.__, 100))] // covert `offset` to decimal point
                 ]), vals),
                 // collect all property value pairs and merge in one object
                 R.reduce(R.merge, {},
