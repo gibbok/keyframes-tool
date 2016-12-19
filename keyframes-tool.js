@@ -44,9 +44,8 @@ let getNodeArguments = () => {
                 throw ('arguments for file-in and file-out must be provided');
             }
             // normalize paths
-            fileIn = path.resolve(path.normalize(__dirname + process.argv[2])).toString();
-            fileOut = path.resolve(path.normalize(__dirname + process.argv[3])).toString();
-
+            fileIn = path.resolve(path.normalize(process.argv[2])).toString();
+            fileOut = path.resolve(path.normalize(process.argv[3])).toString();
             // check paths for extensions
             let isFileInCss = fileIn.endsWith('.css'),
                 isFileOutJson = fileOut.endsWith('.json');
