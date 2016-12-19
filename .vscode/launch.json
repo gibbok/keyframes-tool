@@ -10,7 +10,7 @@
             "name": "Launch Program",
             "program": "${workspaceRoot}\\keyframes-tool.js",
             "cwd": "${workspaceRoot}",
-            "args": [ "../bounce.css", "../bounce.json" ]
+            "args": [ "./test.css", "./test.json" ]
         },
         {
 			"name": "Attach to Node",
