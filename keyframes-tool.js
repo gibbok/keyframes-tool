@@ -178,28 +178,28 @@ let processAST = (data) => {
                     R.map(R.prop('name')),
                     R.map(R.pipe(R.prop('content'), R.flatten))
                 ])
-                // order by property `offset` ascending
-                //R.map(R.pipe(R.sortBy(R.prop('offset'))))
             );
 
-            debugger
-            var transformed = transformAST(data);
+            // order by property `offset` ascending
+            let orderByOffset = R.map(R.pipe(R.sortBy(R.prop('offset'))));
 
+            // convert hyphenated properties to camelCase
+            let convertToCamelCase = (data) => {
+                let mapKeys = R.curry((fn, obj) =>
+                    R.fromPairs(R.map(R.adjust(fn, 0), R.toPairs(obj)))
+                ),
+                    camelCase = (str) => str.replace(/[-_]([a-z])/g, (m) => m[1].toUpperCase())
+                return R.map(R.map(mapKeys(camelCase)), data)
+            };
 
-
-
-            var mapKeys = R.curry((fn, obj) =>
-                R.fromPairs(R.map(R.adjust(fn, 0), R.toPairs(obj)))
+            // process
+            let process = R.pipe(
+                transformAST,
+                orderByOffset,
+                convertToCamelCase
             );
-
-            var camelCase = (str) => str.replace(/[-_]([a-z])/g, (m) => m[1].toUpperCase())
-
-            var result = R.map(R.map(mapKeys(camelCase)), transformed);
-
-
-            var result2 = R.map(R.pipe(R.sortBy(R.prop('offset'))), result);
-
-            fulfill(result2);
+            let result = process(data);
+            fulfill(result);
         } catch (err) {
             reject(err);
         }
