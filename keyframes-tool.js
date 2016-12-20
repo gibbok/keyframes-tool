@@ -177,13 +177,16 @@ let processAST = (data) => {
                 R.converge(R.zipObj, [
                     R.map(R.prop('name')),
                     R.map(R.pipe(R.prop('content'), R.flatten))
-                ]),
+                ])
                 // order by property `offset` ascending
-                R.map(R.pipe(R.sortBy(R.prop('offset'))))
+                //R.map(R.pipe(R.sortBy(R.prop('offset'))))
             );
 
             debugger
             var transformed = transformAST(data);
+
+
+
 
             var mapKeys = R.curry((fn, obj) =>
                 R.fromPairs(R.map(R.adjust(fn, 0), R.toPairs(obj)))
@@ -193,7 +196,10 @@ let processAST = (data) => {
 
             var result = R.map(R.map(mapKeys(camelCase)), transformed);
 
-            fulfill(result);
+
+            var result2 = R.map(R.pipe(R.sortBy(R.prop('offset'))), result);
+
+            fulfill(result2);
         } catch (err) {
             reject(err);
         }
