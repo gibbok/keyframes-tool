@@ -181,7 +181,18 @@ let processAST = (data) => {
                 // order by property `offset` ascending
                 R.map(R.pipe(R.sortBy(R.prop('offset'))))
             );
-            let result = transformAST(data);
+
+            debugger
+            var transformed = transformAST(data);
+
+            var mapKeys = R.curry((fn, obj) =>
+                R.fromPairs(R.map(R.adjust(fn, 0), R.toPairs(obj)))
+            );
+
+            var camelCase = (str) => str.replace(/[-_]([a-z])/g, (m) => m[1].toUpperCase())
+
+            var result = R.map(R.map(mapKeys(camelCase)), transformed);
+
             fulfill(result);
         } catch (err) {
             reject(err);
@@ -223,7 +234,7 @@ let init = () => {
         return writeOutputFile(data);
     }).then((data) => {
         console.log('success: file created at: ' + fileOut);
-    }).catch(function(err) {
+    }).catch(function (err) {
         console.log('error: ' + err);
     });
 };
