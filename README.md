@@ -9,7 +9,7 @@ Use this tool to move your interactive animations from stylesheets to JavaScript
 
 - Install keyframes-tool using `npm install keyframes-tool` or adding it in your `package.json` as: `"devDependencies": { "keyframes-tool": "^1.0.0" }` and run `npm install`.
 - From your project directory, enter `node keyframes-tool /input.css /output.json`,
-where as first argument `/input.css` is the CSS source file to process and second argument `/output.json` is the destination file with the converted result.
+where as first argument `/input.css` is the CSS source file to process and the second argument `/output.json` is the destination file with the converted result.
 Paths should be relative to `keyframes-tool.js` file location.
 - `keyframes-tool` will create a JSON file from your CSS where any CSS Animation declarations found will be added as a property, example:
 
@@ -47,37 +47,37 @@ Output file `/output.json`:
   "flash": [
     {
       "opacity": "1",
-      "offset": 0
+      "offset": "0"
     },
     {
       "opacity": "0",
-      "offset": 0.25
+      "offset": "0.25"
     },
     {
       "opacity": "1",
-      "offset": 0.5
+      "offset": "0.5"
     },
     {
       "opacity": "0",
-      "offset": 0.75
+      "offset": "0.75"
     },
     {
       "opacity": "1",
-      "offset": 1
+      "offset": "1"
     }
   ],
   "pulse": [
     {
       "transform": "scale3d(1, 1, 1)",
-      "offset": 0
+      "offset": "0"
     },
     {
       "transform": "scale3d(1.05, 1.05, 1.05)",
-      "offset": 0.5
+      "offset": "0.5"
     },
     {
       "transform": "scale3d(1, 1, 1)",
-      "offset": 1
+      "offset": "1"
     }
   ]
 }
