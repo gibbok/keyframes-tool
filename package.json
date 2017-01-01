@@ -1,21 +1,33 @@
 {
-  "name": "web-animations-keyframes-tool",
+  "name": "keyframes-tool",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Keyframes-tool is a NodeJs command line tool which convert CSS Animations to a keyframes object suitable for Web Animations API.",
+  "main": "keyframes-tool.js",
+  "keywords": [
+      "keyframes-tool.js",
+      "keyframes-tool",
+      "web animations api",
+      "web animations api tools",
+      "web animations",
+      "animation tool",
+      "animations tool",
+      "keyframes object",
+      "css3 to javascript",
+      "css to javascript"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gibbok/web-animations-keyframes-tool.git"
+    "url": "git+https://github.com/gibbok/keyframes-tool.git"
   },
   "author": "GibboK",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gibbok/web-animations-keyframes-tool/issues"
+    "url": "https://github.com/gibbok/keyframes-tool/issues"
   },
-  "homepage": "https://github.com/gibbok/web-animations-keyframes-tool#readme",
+  "homepage": "https://github.com/gibbok/keyframes-tool#readme",
   "dependencies": {
     "css": "^2.2.1",
     "ramda":"^0.22.1"
