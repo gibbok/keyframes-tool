@@ -13,7 +13,7 @@ where as first argument `./input.css` is the CSS source file to process and the 
 Paths should be relative to `keyframes-tool.js` file location.
 - `keyframes-tool` will create a JSON file from your CSS where any CSS Animation declarations found will be added as a property, example:
 
-Input file `/input.css`:
+Input file `input.css`:
 ```css
 @keyframes flash {
   from, 50%, to {
@@ -40,7 +40,7 @@ Input file `/input.css`:
 }
 
 ```
-Output file `/output.json`:
+Output file `output.json`:
 
 ```json
 {
