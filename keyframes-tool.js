@@ -131,9 +131,13 @@ let processAST = (data) => {
             let processKeyframe = (vals, declarations) => [
                 // map each value
                 R.map(R.cond([
-                    [R.equals('from'), R.always(0)],
-                    [R.equals('to'), R.always(1)],
-                    [R.T, R.pipe(parseFloat, R.divide(R.__, 100))] // covert `offset` to decimal point
+                    [R.equals('from'), R.always("0")],
+                    [R.equals('to'), R.always("1")],
+                    [R.T, R.pipe(
+                        // covert `offset` to a string representing a decimal point
+                        parseFloat, R.divide(R.__, 100),
+                        R.toString()
+                    )]
                 ]), vals),
                 // collect all property value pairs and merge in one object
                 R.reduce(R.merge, {},
