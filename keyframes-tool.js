@@ -1,4 +1,4 @@
-/*! Keyframes-Tool | The MIT License (MIT) | Copyright (c) 2016 GibboK */
+/*! Keyframes-Tool | The MIT License (MIT) | Copyright (c) 2017 GibboK */
 
 const css = require('css');
 const R = require('ramda');
