@@ -79,7 +79,7 @@ let readInputFile = () => {
 }
 
 /**
- * Parse content of CSS input file and creates and AST tree.
+ * Parse content of CSS input file and creates an AST tree.
  */
 let parse = (data) => {
     return new Promise((fulfill, reject) => {
