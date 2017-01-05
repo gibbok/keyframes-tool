@@ -11,7 +11,7 @@ Use this tool to move your interactive animations from stylesheets to JavaScript
 - Run command line in your keyframes-tool directory and enter `node keyframes-tool ./input.css ./output.json`,
 where as first argument `./input.css` is the CSS source file to process and the second argument `./output.json` is the destination file with the converted result.
 Paths should be relative to `keyframes-tool.js` file location.
-- `keyframes-tool` will create a JSON file from your CSS where any CSS Animation declarations found will be added as a property, example:
+- keyframes-tool will create a JSON file from your CSS where any CSS Animation declarations found will be added as a property, example:
 
 Input file `input.css`:
 ```css
