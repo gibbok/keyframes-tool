@@ -1,6 +1,6 @@
 {
   "name": "keyframes-tool",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Keyframes-tool is a NodeJs command line tool which convert CSS Animations to a keyframes object suitable for Web Animations API.",
   "main": "keyframes-tool.js",
   "keywords": [
