@@ -8,7 +8,7 @@ Use this tool to move your interactive animations from stylesheets to JavaScript
 ## Great! So how do I use it?
 
 - Install keyframes-tool using `npm install keyframes-tool` or adding it in your `package.json` as: `"devDependencies": { "keyframes-tool": "^1.0.0" }` and run `npm install`.
-- From your project directory, enter `node keyframes-tool ./input.css ./output.json`,
+- From your Keyframes-tool directory, enter `node keyframes-tool ./input.css ./output.json`,
 where as first argument `./input.css` is the CSS source file to process and the second argument `./output.json` is the destination file with the converted result.
 Paths should be relative to `keyframes-tool.js` file location.
 - `keyframes-tool` will create a JSON file from your CSS where any CSS Animation declarations found will be added as a property, example:
