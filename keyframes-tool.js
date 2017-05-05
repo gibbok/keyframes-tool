@@ -196,11 +196,22 @@ let processAST = (data) => {
                 return R.map(R.map(mapKeys(camelCase)), data)
             };
 
+            // convert `animationTimingFunction` to `easing` for compatibility with web animations api
+            let convertToEasing = (data) => {
+                const convert = data => {
+                    const ease = R.prop('animationTimingFunction', data) || 'ease';
+                    return R.dissoc('animationTimingFunction', R.assoc('easing', ease, data));
+                };
+                let result = R.map(R.map(convert))(data);
+                return result;
+            };
+           
             // process
             let process = R.pipe(
                 transformAST,
                 orderByOffset,
-                convertToCamelCase
+                convertToCamelCase,
+                convertToEasing
             );
             let result = process(data);
             fulfill(result);
