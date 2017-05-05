@@ -206,7 +206,7 @@ let processAST = data => {
                 let result = R.map(R.map(convert))(data);
                 return result;
             };
-           
+
             // process
             let process = R.pipe(
                 transformAST,
