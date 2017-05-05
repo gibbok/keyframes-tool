@@ -11,11 +11,11 @@ let fileIn,
 /**
  * Check software requirements.
  */
-let prerequisiteCheck = () => {
+let checkPrerequisites = () => {
     return new Promise((fulfill, reject) => {
         try {
             // check node version
-            let getNodeVersion = (strVersion) => {
+            let getNodeVersion = strVersion => {
                 let numberPattern = /\d+/g;
                 return numVersion = Number(strVersion.match(numberPattern).join(''))
             },
@@ -33,7 +33,7 @@ let prerequisiteCheck = () => {
 };
 
 /**
- * Get arguments passed Node.js using terminal.
+ * Get arguments passed by Node.js from terminal.
  */
 let getNodeArguments = () => {
     return new Promise((fulfill, reject) => {
@@ -79,9 +79,9 @@ let readInputFile = () => {
 }
 
 /**
- * Parse content of CSS input file and creates an AST tree.
+ * Parse content of CSS input file and create an AST tree.
  */
-let parse = (data) => {
+let parse = data => {
     return new Promise((fulfill, reject) => {
         try {
             let parsedData = css.parse(data.toString(), { silent: false });
@@ -95,7 +95,7 @@ let parse = (data) => {
 /**
  * Validate AST tree content.
  */
-let validate = (data) => {
+let validate = data => {
     return new Promise((fulfill, reject) => {
         try {
             let isStylesheet = data.type === 'stylesheet',
@@ -123,9 +123,9 @@ let validate = (data) => {
 /**
  * Process AST tree content and a new data structure valid for Web Animation API KeyframeEffect.
  * The following code uses Ramda.js for traversing a complex AST tree,
- * an alternative version is visible at http://codepen.io/gibbok/pen/PbRrxp
+ * an alternative and simplified version is visible at http://codepen.io/gibbok/pen/PbRrxp
  */
-let processAST = (data) => {
+let processAST = data => {
     return new Promise((fulfill, reject) => {
         try {
             let processKeyframe = (vals, declarations) => [
@@ -171,7 +171,7 @@ let processAST = (data) => {
                 // get only object whose `type` property is `keyframes`
                 R.filter(R.propEq('type', 'keyframes')),
                 // map each item in `keyframes` collection
-                // to an object {name: keyframe.name, content: [contentOfkeyframes] }
+                // to an object `{name: keyframe.name, content: [contentOfkeyframes] }`
                 R.map((keyframe) => ({
                     name: keyframe.name,
                     content: getContentOfKeyframes(keyframe.keyframes)
@@ -188,7 +188,7 @@ let processAST = (data) => {
             let orderByOffset = R.map(R.pipe(R.sortBy(R.prop('offset'))));
 
             // convert hyphenated properties to camelCase
-            let convertToCamelCase = (data) => {
+            let convertToCamelCase = data => {
                 let mapKeys = R.curry((fn, obj) =>
                     R.fromPairs(R.map(R.adjust(fn, 0), R.toPairs(obj)))
                 ),
@@ -197,7 +197,8 @@ let processAST = (data) => {
             };
 
             // convert `animationTimingFunction` to `easing` for compatibility with web animations api
-            let convertToEasing = (data) => {
+            // and assign `easing` default value to `ease` when `animation-timing-function` from css file is not provided
+            let convertToEasing = data => {
                 const convert = data => {
                     const ease = R.prop('animationTimingFunction', data) || 'ease';
                     return R.dissoc('animationTimingFunction', R.assoc('easing', ease, data));
@@ -224,7 +225,7 @@ let processAST = (data) => {
 /**
  * Write JSON output file.
  */
-let writeOutputFile = (data) => {
+let writeOutputFile = data => {
     return new Promise((fulfill, reject) => {
         data = JSON.stringify(data);
         fs.writeFile(fileOut, data, (err) => {
@@ -241,21 +242,21 @@ let writeOutputFile = (data) => {
  * Initiate conversion process.
  */
 let init = () => {
-    prerequisiteCheck().then(() => {
+    checkPrerequisites().then(() => {
         return getNodeArguments();
     }).then(() => {
         return readInputFile();
-    }).then((data) => {
+    }).then(data => {
         return parse(data);
-    }).then((data) => {
+    }).then(data => {
         return validate(data);
-    }).then((data) => {
+    }).then(data => {
         return processAST(data);
-    }).then((data) => {
+    }).then(data => {
         return writeOutputFile(data);
-    }).then((data) => {
+    }).then(data => {
         console.log('success: file created at: ' + fileOut);
-    }).catch(function (err) {
+    }).catch(err => {
         console.log('error: ' + err);
     });
 };
